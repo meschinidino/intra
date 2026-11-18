@@ -19,6 +19,14 @@ Dino supplies people, accounts, decisions, and manual actions.
 - [Watch-mode data plan](watch-mode-plan.md)
 - [Replay and rollback gates](replay-rollback-gates.md)
 
+## Decision packets (need Dino)
+
+- [Outreach packet](outreach-packet.md): ranked slots, pool messages, booking text. Not sent.
+- [Pilot service candidates](pilot-service-candidates.md): three ranked local candidates.
+- [Security review packet](security-review-packet.md): reviewer brief and routes.
+- [Approval and retention defaults](approval-retention-defaults.md): draft decisions.
+- [Manual run sheets](manual-run-sheets.md): Tailscale proof and Touch ID lane.
+
 ## Local drills before any pilot
 
 Run `./scripts/pilot-drills.sh`. It proves backup, restore, approver
