@@ -20,8 +20,11 @@ Updated from the 2026-11-18 local verification run.
 ## Critical gaps from reviews: local disposition
 
 - Late session kill: integration test proves a live query dies after revoke and reconnect fails. The 60-second deadline is met in the local test by immediate broker close plus role drop.
-- Anchor failure visibility: `intra status` reports anchor age. `verify-anchor` fails on a tampered or truncated chain. A scheduled alert sender is not implemented.
-- Partial revoke: state, retry count, escalation after three failed tries, and an audit alert event exist. A per-service partial success matrix for real Grafana and SaaS classes remains simulator-level.
+- Anchor failure visibility: `intra status` reports anchor age, `anchor_stale`, and `anchor_reason`. `verify-anchor` fails on a tampered or truncated chain. Scheduled anchoring runs in `intrad` when `INTRA_ANCHOR_INTERVAL_SEC` is set, or once through `intra anchor-once`. Alerts go to `.intra/alerts.jsonl` and to `INTRA_ALERT_WEBHOOK` when set. This is local delivery only. No real paging service is proven.
+- Partial revoke: state, retry count, escalation after three failed tries, and an audit alert event exist. `intra status` now lists partial revokes with failed child services and late kills. A per-service partial success matrix for real Grafana and SaaS classes remains simulator-level.
+- Backup and restore: `intra backup` and `intra restore` round-trip grants, audit, anchor, and policy with checksums and chain verification. The backup holds no keys or tokens. `./scripts/pilot-drills.sh` proves restore, approver rebinding, policy rollback, restart, and release-artifact checks on fake state.
+- Store upgrade: grant store format v1 envelope loads the v0.1.0 bare-list format and rejects newer formats. The upgrade test covers both directions.
+- Pilot packages: the demand-gate and Stage 5 packages in `docs/pilot/` are ready to use. They prepare external gates. They are not evidence.
 
 ## Demand gate
 

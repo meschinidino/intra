@@ -77,12 +77,40 @@ Rollback may restore watch-mode routing for one named service for at
 most 24 hours with owner approval. It must never restore broad standing
 reach automatically.
 
+## Scheduled anchoring and alerts
+
+Set `INTRA_ANCHOR_INTERVAL_SEC` on `intrad` to anchor on a timer.
+Set `INTRA_ALERT_WEBHOOK` to deliver alerts. Alerts also land in
+`.intra/alerts.jsonl`. One manual pass: `intra anchor-once --data .intra`.
+`intra status` marks a stale anchor in `anchor_stale` and `anchor_reason`.
+
+## Backup and restore
+
+1. Run `intra backup --data .intra --out backup.zip`.
+2. Stop `intrad`.
+3. Run `intra restore --data TARGET --from backup.zip --force`.
+4. Run `intra verify-anchor --data TARGET`.
+5. Start `intrad` and run `intra status`.
+
+Restore refuses a bad checksum, a broken chain, a bad anchor, and a newer
+grant-store format. The backup holds no keys, certificates, or tokens.
+The approver key reaches a clean host through the operator channel only.
+
+## Approver rebinding
+
+1. Revoke the old device or declare it lost in the emergency record.
+2. Run `intra rebind-approver --data .intra --confirm-old-revoked`.
+3. Restart `intrad`.
+4. Test one read grant, then revoke it.
+
 ## Recovery drills
 
-Before a real pilot, test:
+Run `./scripts/pilot-drills.sh` before a real pilot. It proves backup,
+restore, approver rebinding, policy rollback, restart, and release-artifact
+checks on fake state.
 
-- Grant-store and audit-log restore to a clean host
-- Approver-device rebinding
-- Guard restart during an active grant
+Still manual before a real pilot:
+
+- Guard restart during an active real grant
 - Audit disk-full behavior
-- Postgres session kill after broker restart
+- Postgres session kill after broker restart on the pilot service

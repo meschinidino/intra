@@ -92,6 +92,53 @@ type diskGrant struct {
 	Grant
 }
 
+// StoreFormatVersion is the current grant-store envelope version.
+// Version 0 was the legacy bare JSON grant list from v0.1.0.
+const StoreFormatVersion = 1
+
+type storeEnvelope struct {
+	Version int     `json:"version"`
+	Grants  []Grant `json:"grants"`
+}
+
+// ParseStoreBytes decodes a grant store in legacy v0 or envelope v1 form.
+// It rejects any newer format so an old binary never misreads a new store.
+func ParseStoreBytes(b []byte) ([]Grant, error) {
+	trimmed := bytesTrimSpace(b)
+	if len(trimmed) == 0 {
+		return nil, nil
+	}
+	if trimmed[0] == '[' {
+		var list []Grant
+		if err := json.Unmarshal(b, &list); err != nil {
+			return nil, err
+		}
+		return list, nil
+	}
+	var env storeEnvelope
+	if err := json.Unmarshal(b, &env); err != nil {
+		return nil, err
+	}
+	if env.Version > StoreFormatVersion {
+		return nil, fmt.Errorf("grant store format %d is newer than supported %d; upgrade Intra before opening this store", env.Version, StoreFormatVersion)
+	}
+	if env.Version < 1 {
+		return nil, fmt.Errorf("malformed grant store envelope version %d", env.Version)
+	}
+	return env.Grants, nil
+}
+
+// OpenStoreBytes parses store bytes without opening a file. Backup restore
+// uses it to validate a backed-up store before install.
+func OpenStoreBytes(b []byte) ([]Grant, error) { return ParseStoreBytes(b) }
+
+func bytesTrimSpace(b []byte) []byte {
+	for len(b) > 0 && (b[0] == ' ' || b[0] == '\n' || b[0] == '\r' || b[0] == '\t') {
+		b = b[1:]
+	}
+	return b
+}
+
 func OpenStore(path string) (*Store, error) {
 	s := &Store{path: path, grants: map[string]*Grant{}, byKey: map[string]string{}}
 	b, err := os.ReadFile(path)
@@ -101,11 +148,8 @@ func OpenStore(path string) (*Store, error) {
 	if err != nil {
 		return nil, err
 	}
-	if len(b) == 0 {
-		return s, nil
-	}
-	var list []Grant
-	if err := json.Unmarshal(b, &list); err != nil {
+	list, err := ParseStoreBytes(b)
+	if err != nil {
 		return nil, err
 	}
 	for i := range list {
@@ -121,7 +165,8 @@ func (s *Store) saveLocked() error {
 	for _, g := range s.grants {
 		list = append(list, g.Public())
 	}
-	b, err := json.MarshalIndent(list, "", "  ")
+	sort.Slice(list, func(i, j int) bool { return list[i].ID < list[j].ID })
+	b, err := json.MarshalIndent(storeEnvelope{Version: StoreFormatVersion, Grants: list}, "", "  ")
 	if err != nil {
 		return err
 	}

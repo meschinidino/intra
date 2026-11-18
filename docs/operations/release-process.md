@@ -18,13 +18,17 @@ changelog names the break and migration path.
 2. Update [VERSION](../../VERSION) and `internal/version/version.go`.
 3. Move release notes from `Unreleased` into a dated
    [CHANGELOG](../../CHANGELOG.md) section.
-4. Run `./scripts/verify.sh`.
-5. Run the named manual release lane:
+4. Run `./scripts/verify.sh`. It includes `./scripts/pilot-drills.sh`.
+5. Verify release artifacts: `intra release-checksums`, then
+   `intra verify-release` on a clean copy.
+6. Confirm the prior grant-store format still loads. The store upgrade test
+   covers the v0.1.0 bare-list format and rejects newer formats.
+7. Run the named manual release lane:
    - Real Mac Touch ID approval
    - Mac sleep and wake during an active grant
    - Fresh-machine onboarding timing when making an ease claim
-6. Scan staged files for secrets.
-7. Check `git status --short` and stage files by name.
+8. Scan staged files for secrets.
+9. Check `git status --short` and stage files by name.
 
 ## Tag and publish
 

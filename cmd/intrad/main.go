@@ -123,6 +123,14 @@ func main() {
 		}
 		defer w.Close()
 		srv := &audit.Server{W: w, AdminToken: readTrim(filepath.Join(*data, "admin.token"))}
+		if secs := env("INTRA_ANCHOR_INTERVAL_SEC", ""); secs != "" {
+			var interval int
+			if _, err := fmt.Sscan(secs, &interval); err == nil && interval > 0 {
+				go scheduledAnchor(*data, time.Duration(interval)*time.Second)
+			} else {
+				log.Printf("anchor scheduler: ignoring bad INTRA_ANCHOR_INTERVAL_SEC %q", secs)
+			}
+		}
 		run("audit", func() error { return serveControl(env("INTRA_AUDIT_ADDR", "127.0.0.1:18082"), srv.Handler(), *data) })
 		time.Sleep(100 * time.Millisecond)
 	}
@@ -217,6 +225,52 @@ func main() {
 	}
 
 	log.Fatal(<-errs)
+}
+
+// scheduledAnchor anchors the audit chain on a timer and writes alerts.
+// Alert delivery sinks: alerts.jsonl in the data dir, plus
+// INTRA_ALERT_WEBHOOK when set. Anchor failures never block audit writes.
+func scheduledAnchor(data string, interval time.Duration) {
+	keyPath := env("INTRA_ANCHOR_KEY", "")
+	if keyPath == "" {
+		if home, err := os.UserHomeDir(); err == nil {
+			keyPath = filepath.Join(home, ".config", "intra", "anchor.key")
+		}
+	}
+	key, err := os.ReadFile(keyPath)
+	if err != nil {
+		keyPath = filepath.Join(data, "anchor.key")
+		key, err = os.ReadFile(keyPath)
+		if err != nil {
+			log.Printf("anchor scheduler disabled: no anchor key at %s", keyPath)
+			return
+		}
+	}
+	maxAge := 24 * time.Hour
+	if v := env("INTRA_ANCHOR_MAX_AGE_SEC", ""); v != "" {
+		var secs int
+		if _, err := fmt.Sscan(v, &secs); err == nil && secs > 0 {
+			maxAge = time.Duration(secs) * time.Second
+		}
+	}
+	sink := audit.MultiSink{audit.FileSink{Path: filepath.Join(data, "alerts.jsonl")}}
+	if hook := os.Getenv("INTRA_ALERT_WEBHOOK"); hook != "" {
+		sink = append(sink, audit.WebhookSink{URL: hook})
+	}
+	runOnce := func() {
+		rep, err := audit.AnchorOnce(context.Background(), filepath.Join(data, "audit.jsonl"), filepath.Join(data, "anchor.json"), key, maxAge, sink, time.Now())
+		if err != nil {
+			log.Printf("anchor scheduler: %v", err)
+		} else if rep.Anchored {
+			log.Printf("anchor scheduler: anchored seq %d (%s)", rep.Seq, rep.Reason)
+		}
+	}
+	runOnce()
+	t := time.NewTicker(interval)
+	defer t.Stop()
+	for range t.C {
+		runOnce()
+	}
 }
 
 func serveGuard(g *guard.Guard, data string) error {

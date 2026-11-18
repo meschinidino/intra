@@ -11,6 +11,23 @@ Keep a Changelog, and versions follow Semantic Versioning.
   operations, reference, tutorial, how-to, and agent documentation.
 - Apache-2.0 license, notice, contribution rules, security policy, and
   code of conduct.
+- Scheduled audit anchoring in `intrad` and `intra anchor-once`, with file
+  and webhook alert delivery.
+- `intra backup`, `intra restore`, and `intra rebind-approver` for grant
+  store, audit log, and approver recovery on local state.
+- `intra release-checksums` and `intra verify-release` for artifact checks.
+- Operator status fields for partial revokes, stale anchors, and late kills.
+- Grant store format v1 envelope. It loads the v0.1.0 format and rejects
+  newer formats.
+- `./scripts/pilot-drills.sh` for backup, restore, rebind, rollback,
+  restart, and release-artifact drills. `verify.sh` runs it.
+- Demand-gate and Stage 5 pilot packages in `docs/pilot/`. The packages
+  prepare external gates. They are not evidence.
+
+### Known limitations
+
+- Version stays `0.1.0`. The v0.2.0 pilot gate has not passed.
+- No real service, tenant, reviewer, or interview evidence exists yet.
 
 ## [0.1.0] - 2026-11-18
 

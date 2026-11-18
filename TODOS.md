@@ -25,7 +25,9 @@ systems. Local code completion does not close these items.
 - [ ] Get written consent from its named owner.
 - [ ] Run an independent security review with no open Critical or High
   findings.
-- [ ] Test restore, approver-device rebinding, restart, and rollback.
+- [ ] Test restore, approver-device rebinding, restart, and rollback on
+  the real pilot service. Local fake-state drills pass in
+  `./scripts/pilot-drills.sh`. Local proof does not close this item.
 - [ ] Collect at least 200 watch-mode decisions across at least seven days.
 - [ ] Run clean replay on that service before any enforcement.
 
@@ -51,12 +53,16 @@ systems. Local code completion does not close these items.
 - [ ] Prove one real log and metric surface, starting with Grafana Viewer.
 - [ ] Name a backup approver or record accepted grant wait behavior.
 - [ ] Run a robot workload in a real local runtime with a per-run cert.
-- [ ] Add scheduled anchor copy and an alert sender.
+- [x] Add scheduled anchor copy and an alert sender. Done locally:
+  `intrad` scheduler, `intra anchor-once`, file and webhook alert sinks.
+  A real paging destination stays unproven.
 - [ ] Add SSH, MySQL, or Redis only after a named service needs it.
 
 ## P3 — release maturity
 
 - [ ] Decide the support window for grant-store and audit formats.
-- [ ] Add signed release artifacts and checksum verification.
+- [ ] Add signed release artifacts. Checksum verification is done locally
+  (`intra release-checksums`, `intra verify-release`). Signing stays open.
 - [ ] Add container image publishing after the first real pilot.
-- [ ] Write an upgrade test from the prior release format.
+- [x] Write an upgrade test from the prior release format. Done locally:
+  the store test loads the v0.1.0 bare-list format and rejects newer formats.

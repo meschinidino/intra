@@ -15,6 +15,9 @@ echo "== postgres gateway integration =="
 echo "== docker lab e2e =="
 ./scripts/lab-e2e.sh
 
+echo "== pilot drills =="
+./scripts/pilot-drills.sh
+
 echo "== identity and onboarding =="
 go build -o bin/intra ./cmd/intra
 ./bin/intra issue-identity --data .intra --actor robot --run verify1 >/dev/null

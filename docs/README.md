@@ -50,6 +50,11 @@ Coding agents must start with the root [AGENTS](../AGENTS.md) file.
 - [Runbook](operations/runbook.md)
 - [Release process](operations/release-process.md)
 
+## Pilot packages
+
+- [Pilot packages index](pilot/README.md): demand-gate and Stage 5 packages.
+  These prepare external gates. They create no evidence by themselves.
+
 ## Governing records
 
 - [Approved governing design](designs/intra-design.md)

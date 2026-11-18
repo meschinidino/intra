@@ -126,6 +126,10 @@ intra revoke           revoke a grant and kill live sessions
 intra grants           list grants without returning secrets
 intra status           show guard, broker, audit, grants, and anchor age
 intra anchor           write a signed audit-chain head
+intra anchor-once      run one scheduled anchor pass with alerts
+intra backup           write a checksummed store and audit backup
+intra restore          verify and restore one backup
+intra rebind-approver  rotate the approval key after device loss
 intra verify-anchor    verify the audit chain against its anchor
 intra replay           score recorded decisions against a candidate policy
 intra simulate         list reachable actor-service-action paths

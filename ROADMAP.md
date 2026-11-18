@@ -46,17 +46,23 @@ Effort values marked founder-weeks are estimates, not measurements.
 - [ ] Complete a security review by a reviewer who did not build the guard.
 - [ ] Name one low-risk real service and its written owner consent.
 - [ ] Record two-person approval and log-retention decisions.
-- [ ] Test grant-store restore, approver-device rebinding, restart, and
-  15-minute rollback.
+- [x] Test grant-store restore, approver-device rebinding, restart, and
+  policy rollback locally on fake state (`./scripts/pilot-drills.sh`).
+  The 15-minute rollback on a real service stays open.
 - [ ] Collect at least 200 watch-mode decisions over at least seven days.
 - [ ] Enforce only after clean replay on that service's own traffic.
+- [x] Prepare the demand-gate and Stage 5 pilot packages (`docs/pilot/`).
+  The packages create no evidence.
 
 ## v0.3.0 — operational hardening
 
 - [ ] Repeat ten-minute onboarding with at least two non-founder testers.
-- [ ] Add scheduled audit anchoring and alert delivery.
-- [ ] Add store backup checks to release verification.
-- [ ] Add service-level partial-revoke reporting to operator status.
+- [x] Add scheduled audit anchoring and alert delivery. Done locally ahead
+  of schedule: `intrad` scheduler, `anchor-once`, file and webhook sinks.
+- [x] Add store backup checks to release verification. Done locally ahead
+  of schedule: backup checksums, restore verification, artifact checksums.
+- [x] Add service-level partial-revoke reporting to operator status. Done
+  locally ahead of schedule: `intra status` lists failed child services.
 - [ ] Test Mac sleep, restart, disk-full, clock skew, and stale certificate
   behavior as named manual release lanes.
 - [ ] Record the guard-host availability decision from pilot evidence.

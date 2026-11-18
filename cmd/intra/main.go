@@ -19,6 +19,7 @@ import (
 
 	"intra/internal/audit"
 	"intra/internal/broker"
+	"intra/internal/ops"
 	"intra/internal/drill"
 	"intra/internal/onboard"
 	"intra/internal/policy"
@@ -88,6 +89,18 @@ func main() {
 		fatal(cmdIssueIdentity(os.Args[2:]))
 	case "onboard":
 		fatal(cmdOnboardApply(os.Args[2:]))
+	case "backup":
+		fatal(cmdBackup(os.Args[2:]))
+	case "restore":
+		fatal(cmdRestore(os.Args[2:]))
+	case "rebind-approver":
+		fatal(cmdRebind(os.Args[2:]))
+	case "anchor-once":
+		fatal(cmdAnchorOnce(os.Args[2:]))
+	case "release-checksums":
+		fatal(cmdReleaseChecksums(os.Args[2:], false))
+	case "verify-release":
+		fatal(cmdReleaseChecksums(os.Args[2:], true))
 	default:
 		usage()
 		os.Exit(2)
@@ -95,7 +108,7 @@ func main() {
 }
 
 func usage() {
-	fmt.Println("intra <version|init-demo|compile|request|approve|revoke|grants|status|anchor|verify-anchor|replay|draft|simulate|drills|import|providers|latency|issue-identity|onboard>")
+	fmt.Println("intra <version|init-demo|compile|request|approve|revoke|grants|status|anchor|verify-anchor|anchor-once|replay|draft|simulate|drills|import|providers|latency|issue-identity|onboard|backup|restore|rebind-approver|release-checksums|verify-release>")
 }
 
 func brokerBase() string {
@@ -332,7 +345,135 @@ func cmdStatus(args []string) error {
 	} else {
 		out["anchor_age_seconds"] = -1
 	}
+	// Operator summary: partial revoke, stale anchor, and late kills.
+	var grants []broker.Grant
+	if code, b := getOK(brokerBase() + "/grants"); code == 200 {
+		_ = json.Unmarshal(b, &grants)
+	}
+	var headSeq uint64
+	if events, err := loadAudit(*data); err == nil && len(events) > 0 {
+		headSeq = events[len(events)-1].Seq
+	}
+	maxAge := 24 * time.Hour
+	if v := os.Getenv("INTRA_ANCHOR_MAX_AGE_SEC"); v != "" {
+		var secs int
+		if _, err := fmt.Sscan(v, &secs); err == nil && secs > 0 {
+			maxAge = time.Duration(secs) * time.Second
+		}
+	}
+	sum := ops.Summarize(grants, anchor, headSeq, maxAge, time.Now())
+	out["grants_by_state"] = sum.GrantsByState
+	out["partial_revokes"] = sum.PartialRevokes
+	out["late_kills"] = sum.LateKills
+	out["anchor_stale"] = sum.AnchorStale
+	out["anchor_reason"] = sum.AnchorReason
 	printJSON(out)
+	return nil
+}
+
+func cmdBackup(args []string) error {
+	fs := flag.NewFlagSet("backup", flag.ExitOnError)
+	data := fs.String("data", ".intra", "data")
+	out := fs.String("out", "", "backup zip path")
+	_ = fs.Parse(args)
+	if *out == "" {
+		return fmt.Errorf("--out required")
+	}
+	if err := ops.CreateBackup(*data, *out); err != nil {
+		return err
+	}
+	fmt.Println("backup written to", *out)
+	return nil
+}
+
+func cmdRestore(args []string) error {
+	fs := flag.NewFlagSet("restore", flag.ExitOnError)
+	data := fs.String("data", ".intra", "data")
+	from := fs.String("from", "", "backup zip path")
+	force := fs.Bool("force", false, "replace existing grants and audit state")
+	_ = fs.Parse(args)
+	if *from == "" {
+		return fmt.Errorf("--from required; stop intrad before restore")
+	}
+	if !*force {
+		for _, name := range []string{"grants.json", "audit.jsonl"} {
+			if _, err := os.Stat(filepath.Join(*data, name)); err == nil {
+				return fmt.Errorf("%s exists in %s; stop intrad and pass --force to restore over it", name, *data)
+			}
+		}
+	}
+	key, _ := readAnchorKey(*data)
+	if err := ops.RestoreBackup(*from, *data, key); err != nil {
+		return err
+	}
+	fmt.Println("restore OK; restart intrad")
+	return nil
+}
+
+func cmdRebind(args []string) error {
+	fs := flag.NewFlagSet("rebind-approver", flag.ExitOnError)
+	data := fs.String("data", ".intra", "data")
+	confirm := fs.Bool("confirm-old-revoked", false, "confirm the old approver device is revoked or declared lost")
+	_ = fs.Parse(args)
+	if !*confirm {
+		return fmt.Errorf("--confirm-old-revoked required: revoke or declare the old device lost first")
+	}
+	if err := ops.RebindApprover(*data, time.Now()); err != nil {
+		return err
+	}
+	fmt.Println("approver rebound; restart intrad to load the new key")
+	return nil
+}
+
+func cmdAnchorOnce(args []string) error {
+	fs := flag.NewFlagSet("anchor-once", flag.ExitOnError)
+	data := fs.String("data", ".intra", "data")
+	maxAgeSec := fs.Int("max-age-sec", 86400, "max anchor age in seconds")
+	_ = fs.Parse(args)
+	key, err := readAnchorKey(*data)
+	if err != nil {
+		return err
+	}
+	sink := audit.MultiSink{audit.FileSink{Path: filepath.Join(*data, "alerts.jsonl")}}
+	if hook := os.Getenv("INTRA_ALERT_WEBHOOK"); hook != "" {
+		sink = append(sink, audit.WebhookSink{URL: hook})
+	}
+	rep, err := audit.AnchorOnce(context.Background(), filepath.Join(*data, "audit.jsonl"), filepath.Join(*data, "anchor.json"), key, time.Duration(*maxAgeSec)*time.Second, sink, time.Now())
+	if err != nil {
+		return err
+	}
+	printJSON(rep)
+	return nil
+}
+
+func cmdReleaseChecksums(args []string, verify bool) error {
+	fs := flag.NewFlagSet("release-checksums", flag.ExitOnError)
+	dir := fs.String("dir", ".", "artifact directory")
+	files := fs.String("files", "", "comma file names (generate mode)")
+	out := fs.String("out", "", "checksums path (generate mode)")
+	sums := fs.String("checksums", "", "checksums path (verify mode)")
+	_ = fs.Parse(args)
+	if verify {
+		if *sums == "" {
+			return fmt.Errorf("--checksums required")
+		}
+		bad, err := ops.VerifyChecksums(*sums, *dir)
+		if err != nil {
+			return err
+		}
+		if len(bad) > 0 {
+			return fmt.Errorf("release verification failed for: %s", strings.Join(bad, ", "))
+		}
+		fmt.Println("release artifacts OK")
+		return nil
+	}
+	if *out == "" || *files == "" {
+		return fmt.Errorf("--files and --out required")
+	}
+	if err := ops.WriteChecksums(*dir, split(*files), *out); err != nil {
+		return err
+	}
+	fmt.Println("checksums written to", *out)
 	return nil
 }
 

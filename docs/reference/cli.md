@@ -94,10 +94,47 @@ List public grant records. Database secrets and grant tokens never print.
 Print broker, audit, guard, audit head, grant counts, and anchor age.
 `--data` defaults to `.intra`.
 
+Output also holds `grants_by_state`, `partial_revokes` (grant id, failed
+child services, revoke tries, escalation), `late_kills` (expired active
+grants and grants stuck in a revoke state), `anchor_stale`, and
+`anchor_reason`. `INTRA_ANCHOR_MAX_AGE_SEC` sets the stale limit.
+
 ## `intra anchor` and `intra verify-anchor`
 
 Write or verify the HMAC-signed audit head at `.intra/anchor.json`.
 `verify-anchor` prints `anchor OK` on success.
+
+## `intra anchor-once`
+
+Run one scheduled-anchor pass. It anchors when the anchor is missing, stale,
+or behind the chain head. `--max-age-sec` defaults to `86400`.
+Alerts go to `.intra/alerts.jsonl` and to `INTRA_ALERT_WEBHOOK` when set.
+A broken chain refuses anchoring and writes one `anchor_failed` alert.
+
+The server runs the same pass on a timer when `INTRA_ANCHOR_INTERVAL_SEC`
+is set on `intrad`.
+
+## `intra backup` and `intra restore`
+
+`intra backup --out backup.zip` writes one zip with a checksum manifest.
+It holds grants, audit, anchor, and policy state only. It never holds keys,
+certificates, or tokens.
+
+`intra restore --from backup.zip --data DIR` verifies every checksum, the
+audit chain, the anchor, and the grant-store format before install.
+Stop `intrad` first. Restore over existing state needs `--force`.
+
+## `intra rebind-approver`
+
+Replace the approval key after the old device is revoked or declared lost.
+`--confirm-old-revoked` is required. The command writes fingerprint records
+only, never key copies. Restart `intrad` after rebind.
+
+## `intra release-checksums` and `intra verify-release`
+
+`intra release-checksums --dir DIR --files intra --out DIR/SHA256SUMS`
+writes SHA-256 checksums. `intra verify-release --dir DIR --checksums
+DIR/SHA256SUMS` fails on any missing or mismatched artifact.
 
 ## `intra replay`
 

@@ -11,6 +11,8 @@
 | `INTRA_TOUCHID_HELPER` | empty | Default Touch ID helper binary |
 | `INTRA_AUDIT_ADDR` | `127.0.0.1:18082` | Audit address used by `status` |
 | `INTRA_GUARD_HTTP_ADDR` | `127.0.0.1:18080` | Plain guard address used by `status` |
+| `INTRA_ANCHOR_MAX_AGE_SEC` | `86400` | Anchor age that marks `status` output stale |
+| `INTRA_ALERT_WEBHOOK` | empty | Alert webhook URL for `anchor-once` and the scheduler |
 
 ## Server
 
@@ -28,6 +30,9 @@
 | `INTRA_TOUCHID_HELPER` | empty | Server-side Touch ID helper path |
 | `INTRA_ALLOW_HEADER_ID` | unset | Set `1` only for tests or controlled lab wiring |
 | `INTRA_VERIFY_MANIFESTS` | unset | Set `1` to verify robot run manifests |
+| `INTRA_ANCHOR_INTERVAL_SEC` | empty | Audit anchor scheduler interval; empty disables it |
+| `INTRA_ANCHOR_MAX_AGE_SEC` | `86400` | Anchor age limit for the scheduler |
+| `INTRA_ALERT_WEBHOOK` | empty | Alert webhook URL for scheduled anchoring |
 | `INTRA_ENTRA_SIM_ADDR` | `127.0.0.1:18084` | Entra simulator listen address |
 | `INTRA_GOOGLE_SIM_ADDR` | `127.0.0.1:18085` | Google simulator listen address |
 

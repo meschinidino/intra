@@ -8,7 +8,9 @@ See the [policy schema](policy-schema.md). Policy is source.
 
 ## Grant store
 
-`grants.json` is a JSON array of public grant records.
+`grants.json` is a format v1 envelope: `{"version": 1, "grants": [...]}`.
+It holds public grant records only. The reader also loads the v0.1.0 bare
+JSON array and upgrades it on the next save. It rejects newer formats.
 
 Important fields:
 
@@ -46,6 +48,13 @@ belong in this file.
 `anchor.json` contains `seq`, `head`, `sig`, and `ts`. The signature is
 HMAC-SHA256 over `seq:head`. Keep its key outside the repository and
 outside the server data volume.
+
+## Backup archive
+
+`intra backup` writes one zip with `manifest.json` plus `grants.json`,
+`audit.jsonl`, `anchor.json`, `policy.json`, and `compiled.json` when present.
+The manifest holds one SHA-256 and size per file, the backup format version,
+and the Intra version. Keys, certificates, and tokens never enter a backup.
 
 ## Run manifest
 
