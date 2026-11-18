@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "actors": {
+    "owner": {"name": "owner", "kind": "human", "owner": "founder"},
+    "robot": {"name": "robot", "kind": "robot", "owner": "founder"}
+  },
+  "services": {
+    "normal": {
+      "name": "normal",
+      "kind": "http",
+      "sensitive": false,
+      "upstream": "http://lab-normal:18090",
+      "actions": ["read"],
+      "owner": "founder"
+    },
+    "sensitive-db": {
+      "name": "sensitive-db",
+      "kind": "postgres",
+      "sensitive": true,
+      "upstream": "",
+      "actions": ["read"],
+      "owner": "founder",
+      "objects": ["secrets"]
+    },
+    "internet": {
+      "name": "internet",
+      "kind": "egress",
+      "sensitive": true,
+      "upstream": "",
+      "actions": ["egress"],
+      "owner": "founder"
+    }
+  },
+  "rules": [
+    {"actor": "owner", "service": "normal", "actions": ["read"], "access": "static"},
+    {"actor": "owner", "service": "sensitive-db", "actions": ["read"], "access": "grant", "max_ttl_seconds": 28800},
+    {"actor": "robot", "service": "normal", "actions": ["read"], "access": "static"},
+    {"actor": "robot", "service": "internet", "actions": ["egress"], "access": "template", "template_id": "robot-egress"}
+  ],
+  "templates": [
+    {
+      "id": "robot-egress",
+      "actor": "robot",
+      "services": ["internet"],
+      "actions": ["egress"],
+      "max_ttl_seconds": 7200
+    }
+  ],
+  "egress": [
+    {"actor": "robot", "hosts": ["example.com"], "ports": [443]}
+  ]
+}

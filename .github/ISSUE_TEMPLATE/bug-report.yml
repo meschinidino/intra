@@ -1,0 +1,44 @@
+name: Bug report
+description: Report incorrect behavior with fake data only
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not include real credentials, tokens, private keys, or customer data.
+        For vulnerabilities, follow SECURITY.md instead of this form.
+  - type: input
+    id: version
+    attributes:
+      label: Intra version
+      description: Output of `intra version`
+      placeholder: "0.1.0"
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction steps
+      description: Exact commands with fake data only
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant output
+      description: Remove tokens, keys, hostnames, and private data first
+      render: shell

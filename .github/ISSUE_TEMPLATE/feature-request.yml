@@ -1,0 +1,30 @@
+name: Feature request
+description: Propose one scoped capability or workflow
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Name the actor, task, and current cost
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+    validations:
+      required: true
+  - type: textarea
+    id: security
+    attributes:
+      label: Security effect
+      description: New allow paths, identities, secrets, or failure modes
+    validations:
+      required: true
+  - type: textarea
+    id: proof
+    attributes:
+      label: Proof you expect
+      description: Test, drill, benchmark, or user evidence that would close this

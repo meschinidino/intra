@@ -1,0 +1,96 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: labdb
+      POSTGRES_USER: postgres
+      POSTGRES_HOST_AUTH_METHOD: trust
+    volumes:
+      - ./lab/postgres/init.sql:/docker-entrypoint-initdb.d/001-intra.sql:ro
+    networks: [dbnet]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d labdb"]
+      interval: 2s
+      retries: 30
+
+  lab-normal:
+    build: .
+    entrypoint: ["labservice"]
+    environment:
+      LAB_MODE: normal
+      LAB_ADDR: ":18090"
+    networks: [svcnet]
+
+  lab-logs:
+    build: .
+    entrypoint: ["labservice"]
+    environment:
+      LAB_MODE: logs
+      LAB_ADDR: ":18090"
+      LAB_VIEWER_TOKEN: ${LAB_VIEWER_TOKEN:-}
+    networks: [svcnet]
+
+  lab-metrics:
+    build: .
+    entrypoint: ["labservice"]
+    environment:
+      LAB_MODE: metrics
+      LAB_ADDR: ":18090"
+      LAB_VIEWER_TOKEN: ${LAB_VIEWER_TOKEN:-}
+    networks: [svcnet]
+
+  attacker:
+    build: .
+    entrypoint: ["labservice"]
+    environment:
+      LAB_MODE: attacker
+      LAB_ADDR: ":18090"
+    ports:
+      - "127.0.0.1:18093:18090"
+    networks: [edge]
+
+  intra:
+    build: .
+    user: "${INTRA_UID:-501}:${INTRA_GID:-20}"
+    command: ["all", "--data", "/data", "--policy", "/data/policy.json"]
+    environment:
+      INTRA_DATA: /data
+      INTRA_AUDIT_ADDR: 0.0.0.0:18082
+      INTRA_BROKER_ADDR: 0.0.0.0:18081
+      INTRA_GUARD_ADDR: 0.0.0.0:18443
+      INTRA_GUARD_HTTP_ADDR: 0.0.0.0:18080
+      INTRA_EGRESS_ADDR: 0.0.0.0:18083
+      INTRA_PG_ADDR: 0.0.0.0:15432
+      INTRA_PG_ADMIN_URL: postgres://intra_broker_admin@postgres:5432/labdb?sslmode=disable
+      INTRA_PG_BASE_URL: postgres://unused@postgres:5432/labdb?sslmode=disable
+    volumes:
+      - ./.intra/policy.json:/data/policy.json:ro
+      - ./.intra/compiled.json:/data/compiled.json:ro
+      - ./.intra/approval.key:/data/approval.key:ro
+      - ./.intra/admin.token:/data/admin.token:ro
+      - ./.intra/viewer.token:/data/viewer.token:ro
+      - ./.intra/grants.json:/data/grants.json
+      - ./.intra/audit.jsonl:/data/audit.jsonl
+      - ./.intra/audit.jsonl.lock:/data/audit.jsonl.lock
+      - ./.intra/certs/ca.crt:/data/certs/ca.crt:ro
+      - ./.intra/certs/guard.crt:/data/certs/guard.crt:ro
+      - ./.intra/certs/guard.key:/data/certs/guard.key:ro
+      - ./.intra/certs/control.crt:/data/certs/control.crt:ro
+      - ./.intra/certs/control.key:/data/certs/control.key:ro
+    ports:
+      - "127.0.0.1:18080:18080"
+      - "127.0.0.1:18443:18443"
+      - "127.0.0.1:18081:18081"
+      - "127.0.0.1:18082:18082"
+      - "127.0.0.1:15432:15432"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [dbnet, svcnet, edge]
+
+networks:
+  dbnet:
+    internal: true
+  svcnet:
+    internal: true
+  edge:
