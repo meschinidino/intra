@@ -12,7 +12,10 @@ import (
 
 type recordSink struct{ alerts []Alert }
 
-func (r *recordSink) Send(_ context.Context, a Alert) error { r.alerts = append(r.alerts, a); return nil }
+func (r *recordSink) Send(_ context.Context, a Alert) error {
+	r.alerts = append(r.alerts, a)
+	return nil
+}
 
 func TestAnchorOnceStaleThenFreshAndWebhook(t *testing.T) {
 	dir := t.TempDir()

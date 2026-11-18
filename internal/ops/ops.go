@@ -249,26 +249,26 @@ func VerifyChecksums(checksumsPath, baseDir string) ([]string, error) {
 
 // StatusSummary is the operator view of grant and anchor health.
 type StatusSummary struct {
-	GrantsByState map[string]int   `json:"grants_by_state"`
+	GrantsByState  map[string]int  `json:"grants_by_state"`
 	PartialRevokes []PartialRevoke `json:"partial_revokes,omitempty"`
-	LateKills     []LateKill       `json:"late_kills,omitempty"`
-	AnchorStale   bool             `json:"anchor_stale"`
-	AnchorReason  string           `json:"anchor_reason,omitempty"`
+	LateKills      []LateKill      `json:"late_kills,omitempty"`
+	AnchorStale    bool            `json:"anchor_stale"`
+	AnchorReason   string          `json:"anchor_reason,omitempty"`
 }
 
 type PartialRevoke struct {
-	GrantID      string   `json:"grant_id"`
-	Services     []string `json:"services"`
-	Failed       []string `json:"failed_children,omitempty"`
-	RevokeTries  int      `json:"revoke_tries"`
-	Escalated    bool     `json:"escalated"`
+	GrantID     string   `json:"grant_id"`
+	Services    []string `json:"services"`
+	Failed      []string `json:"failed_children,omitempty"`
+	RevokeTries int      `json:"revoke_tries"`
+	Escalated   bool     `json:"escalated"`
 }
 
 type LateKill struct {
-	GrantID string   `json:"grant_id"`
-	State   string   `json:"state"`
-	Services []string `json:"services"`
-	OverdueSeconds int `json:"overdue_seconds"`
+	GrantID        string   `json:"grant_id"`
+	State          string   `json:"state"`
+	Services       []string `json:"services"`
+	OverdueSeconds int      `json:"overdue_seconds"`
 }
 
 // Summarize builds the operator summary from public grant records.
