@@ -1,43 +1,46 @@
 # Pilot service candidates — local inventory
 
-Method: read-only listing of `~/Documents/personal-projects` on 2026-11-18.
+Method: read-only listing of local projects on 2026-11-18, revised after
+Dino rejected static frontends. A frontend proves no sensitive read, no
+database denial, and no session kill. Only backend services rank here.
 I read directory names and README heads only. I read no secret, env, or
-credential file. Owner for all three: Dino Meschini.
-None of these is a consented pilot yet. Dino chooses. The Stage 5 checklist
-in [service selection](service-selection.md) still applies in full.
+credential file. No candidate is consented yet. Dino chooses.
 
-## Rank 1 — Vonder website
+Excluded without ranking: `tes-um` and `hapi` under `~/Documents`.
+They are employer or client systems. Dino cannot consent for them.
+Static sites (Vonder, portfolio) also leave the list for the reason above.
 
-- Path: `~/Documents/personal-projects/websites/vonder` (`web/` Astro app, `site/` static copy).
-- Owner: Dino Meschini.
-- Data class: public marketing content. No customer, personal, or payment data found in the listing.
-- Dependencies: Astro, npm, Cloudflare through `wrangler.jsonc`. No database.
-- Rollback path: redeploy the prior `dist` output, or keep the service in watch mode on a local copy first.
-- Why it qualifies: static HTTP service, no data store, instant rollback, real deployment surface.
-- Gap: production URL and current traffic source are unconfirmed. Dino confirms before any consent step.
+## Rank 1 — Café Orders (demo_andes_tech)
 
-## Rank 2 — Personal portfolio site
+- Path: `~/Documents/demo_andes_tech`. Next.js, Prisma, Postgres in Compose.
+- Owner: Dino Meschini (local git history).
+- Data class: café order data from a demo build and seed flows. No payment surface found in the README.
+- Dependencies: Node, Postgres container, Prisma migrations.
+- Rollback path: stop the service container, or return its route to watch mode. The database stays untouched by rollback.
+- Why it qualifies: a real Postgres read surface matches the Intra wedge. Demo data keeps the risk low.
+- Gap: confirm no live café deployment uses this build before consent. If one does, it drops off the list.
 
-- Path: `~/Documents/personal-site` (static `index.html` with `dist/` and `dist-pages/`).
-- Owner: Dino Meschini.
-- Data class: public portfolio content. No customer, personal, or payment data found in the listing.
-- Dependencies: static hosting only. Heavier local clutter (`node_modules`) but no runtime service.
-- Rollback path: republish the prior static output.
-- Why it qualifies: same static profile as rank 1 with fewer moving parts.
-- Gap: it proves less than Vonder because it has no app framework or deploy config to observe.
+## Rank 2 — Antesala, seeded instance only
 
-## Rank 3 — Unihero study app
+- Path: `~/Documents/antesala`. Go server, PostgreSQL, WhatsApp gateway.
+- Owner: Dino Meschini (his GitHub repo, with collaborators).
+- Data class: clinical intake. On real data this is patient personal data and it fails low-risk at once.
+- Dependencies: Go, Postgres, WAHA container, model providers.
+- Rollback path: stop the seeded instance. It shares nothing with any real clinic deployment.
+- Why it qualifies: the strongest wedge match in the inventory, with Postgres at the center.
+- Gap: it qualifies only as a fresh instance with fake seed patients. The real service never enters the pilot.
 
-- Path: `~/Documents/personal-projects/apps/unihero/app` (single local `index.html`).
-- Owner: Dino Meschini, single user.
-- Data class: Dino's own study records. Personal data, but only his own. No third-party data.
-- Dependencies: browser only. No server, no network service.
-- Rollback path: stop serving the file. Nothing external changes.
-- Why it qualifies: watch mode can observe one real daily workflow with zero outside exposure.
-- Gap: it is local-only, so it proves no remote route or real session kill. It can support the demand observation before it supports Stage 5.
+## Rank 3 — Oravela HR app, fake tenant only
 
-## Not candidates
+- Path: `~/Documents/hrapp`. Single Go binary, Postgres, row-level security.
+- Owner: Dino Meschini (his GitHub repo).
+- Data class: employee HR data in a multi-tenant design. Real tenants would fail low-risk.
+- Dependencies: Docker Compose, Postgres, migrations, Caddy.
+- Rollback path: delete the fake tenant, or return the route to watch mode.
+- Why it qualifies: a Postgres backend with a real authorization layer to observe.
+- Gap: it qualifies only with one fake tenant and invented employees. No real company data.
 
-- `startup/agent-wallet`: design brief only, no code, and its topic is real money. It fails low-risk by subject.
-- `apps/tinspire-loader`: USB tool, no network service to place behind a guard.
-- `portfolio/model-lobotomy*`: model and data stores, heavier surface, unclear data classes. It needs its own classification first.
+## Decision needed
+
+Pick rank 1 for lowest data risk. Pick rank 2 for the strongest wedge proof.
+Both need the fake-data confirmation in writing before the Stage 5 checklist opens.

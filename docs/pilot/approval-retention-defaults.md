@@ -30,6 +30,18 @@ costs one named person and removes the largest single-person risk.
 Why: 90 days covers one incident review cycle. Longer storage grows the
 metadata exposure without a named need.
 
+## Operator recommendation for Dino (one-word confirmation)
+
+Dino has no second approver today. The workable default for his own pilot:
+
+1. Solo approval accepted in writing for this pilot only, with an end date.
+   Every sensitive grant records approver, reason, and Touch ID in the audit chain.
+2. A named backup approver joins before any second person uses the pilot.
+   From that day, the two-person rule applies in full.
+3. Retention: 90 days for decision metadata, as drafted above.
+
+Reply `defaults ok` to record this, or name the change.
+
 ## Decision record (Dino completes)
 
 - Two-person rule accepted / changed: ____________ Date: ________

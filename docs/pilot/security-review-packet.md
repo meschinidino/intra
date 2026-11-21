@@ -1,6 +1,9 @@
 # Security review packet and reviewer brief
 
-Status: no reviewer is engaged. Dino chooses the route. No finding exists yet.
+Status: Dino chose route C, community review, on 2026-11-18.
+No reviewer is engaged yet. No finding exists yet.
+Route C closes the gate only when one named external reviewer completes the
+full checklist and signs the findings table. A comment thread alone does not close it.
 
 ## Reviewer brief (send as-is after choosing a route)
 
@@ -38,9 +41,22 @@ or reciprocity before you start.
 | B — external security consultant | A hired reviewer | Cash fee, written report | Cost, slower start |
 | C — community review | A public call for review on the repo | Free, slow, uneven depth | May never land |
 
-Recommended: route A first. It keeps one named accountable reviewer.
-Route B fits if no peer can take it within two weeks.
-Route C alone does not close the gate, because depth is unproven.
+Decision recorded: route C, community review (Dino, 2026-11-18).
+The public call goes out only after Dino approves its text.
+The gate condition stands: one named reviewer, full checklist, signed findings.
+
+## Community review call — draft, not posted
+
+Post as a GitHub issue on `meschinidino/intra` after Dino approves this text.
+
+Title: Security review wanted — default-deny access layer, checklist provided
+
+Intra is a founder-built, default-deny access layer (Go, local lab at v0.1.0).
+It needs one independent security review before any real service pilot.
+The reviewer must not have built the guard. A full checklist, test commands,
+and a findings table ship in `docs/pilot/security-review.md`.
+The gate: no open Critical or High finding. Reply here if you will take it
+as the named reviewer. The review closes only with a signed findings table.
 
 ## After the review
 
