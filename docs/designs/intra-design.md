@@ -189,6 +189,30 @@ Deferred by design until demand evidence exists. Expected shape if built: self-h
 
 This week: book and run five 30-minute calls. Recruit from reachable pools only: former colleagues outside the example employer, local developer and infra communities, open-source maintainers who run prod, and small-team or MSP contacts reachable through the founder's own network. Mix: at least 3 tech leads or infra owners who own prod incidents and access control (the guessed buyer), at most 2 agent builders. Ask each to rank blocked incident read access vs split human and agent policy, then rank the six expansion pains: SaaS and vendor grant sprawl, multi-service incident access, robot task access, reach simulation, self-attack drills, and onboarding time. Record their current prod access path plus one incident delay. Bring names, roles, and quotes before Stage 3. Fewer than 5 booked calls at week end is itself evidence: report the count and the channels tried.
 
+## Founder Amendment — demand gate deferred (2026-11-18)
+
+The founder accepts the demand risk in writing and defers the demand gate.
+The founder-operated pilot on the founder's own service may proceed without
+completed interviews. This amendment changes sequencing only.
+
+What stays true:
+
+- No external buyer, demand, or willingness to pay is proven.
+- No product claim may cite the pilot as demand evidence.
+- Interviews stay owed before any demand claim, pricing claim, or public launch claim.
+- The fresh demand check before each expansion stage stays unchanged.
+- The Stage 5 entry gates stay unchanged: consent, security review, approval and retention decisions, rollback proof, watch mode, and clean replay.
+- The kill gate still applies when interview evidence exists. Deferred evidence cannot fire it and cannot clear it.
+
+What changes:
+
+- Stage 3 mechanics and the founder-operated Stage 5 pilot no longer wait for five completed interviews.
+- Interview work continues in parallel through the outreach packet in `docs/pilot/`.
+- The demand gate line in Success Criteria stays the test for demand claims. It is unpassed and must be reported as unpassed.
+
+Reason recorded by the founder: the pilot proves operability on his own
+service now. Demand proof follows before any external claim.
+
 ## What I noticed about how you think
 
 - You keep returning to operability under isolation: "isolating a system without completely making it non operative." Shutdown is never your answer.

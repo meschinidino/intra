@@ -29,6 +29,9 @@ Effort values marked founder-weeks are estimates, not measurements.
 
 ## Demand gate before product claims
 
+Status: unpassed. The founder amendment of 2026-11-18 defers this gate for
+the founder-operated pilot. It stays required before any demand claim.
+
 - [ ] Run five 30-minute practitioner calls: at least three tech leads or
   infrastructure owners and at most two agent builders.
 - [ ] Record each current production access path and one incident delay.
@@ -42,7 +45,8 @@ Effort values marked founder-weeks are estimates, not measurements.
 
 ## v0.2.0 — founder-operated pilot
 
-- [ ] Pass the demand gate.
+- [ ] Pass the demand gate. Deferred for this pilot by the founder
+  amendment of 2026-11-18. Still unpassed.
 - [ ] Complete a security review by a reviewer who did not build the guard.
 - [ ] Name one low-risk real service and its written owner consent.
 - [ ] Record two-person approval and log-retention decisions.

@@ -28,6 +28,9 @@ Keep a Changelog, and versions follow Semantic Versioning.
 
 - Version stays `0.1.0`. The v0.2.0 pilot gate has not passed.
 - No real service, tenant, reviewer, or interview evidence exists yet.
+- Founder amendment of 2026-11-18 defers the demand gate for the
+  founder-operated pilot. The gate stays unpassed. No demand claim follows
+  from the pilot.
 
 ## [0.1.0] - 2026-11-18
 

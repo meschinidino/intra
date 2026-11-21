@@ -28,7 +28,8 @@ Updated from the 2026-11-18 local verification run.
 
 ## Demand gate
 
-The first lab user is Dino Meschini, founder and Mac owner. That closes the
-lab-user question only. It does not prove an external buyer. Stage 3 product
-claims beyond the local lab still need the five practitioner interviews in the
-governing plan.
+Status: unpassed, deferred by the founder amendment of 2026-11-18 in the
+governing design. The amendment accepts demand risk for the founder-operated
+pilot on his own service. It proves no external buyer. Demand claims still
+need the five practitioner interviews. Interview work continues through
+`docs/pilot/outreach-packet.md`. No person has been contacted yet.

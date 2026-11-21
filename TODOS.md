@@ -5,6 +5,9 @@ systems. Local code completion does not close these items.
 
 ## P1 — demand proof
 
+Status: deferred by the founder amendment of 2026-11-18 for the
+founder-operated pilot. Still owed before any demand claim.
+
 - [ ] Book and run five practitioner interviews.
   - At least three tech leads or infrastructure owners.
   - At most two agent builders.
